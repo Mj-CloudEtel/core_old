@@ -1,7 +1,7 @@
 <?php
 
 /**
- *    Copyright (C) 2015 Cloud_Etel
+ *    Copyright (C) 2015 Deciso B.V.
  *
  *    All rights reserved.
  *
@@ -80,7 +80,7 @@ class Drive
 
         $this->client->setAuthConfig($service_account);
         $this->client->addScope("https://www.googleapis.com/auth/drive");
-        $this->client->setApplicationName("reach_guard");
+        $this->client->setApplicationName("OPNsense");
 
         $this->service = new \Google_Service_Drive($this->client);
     }

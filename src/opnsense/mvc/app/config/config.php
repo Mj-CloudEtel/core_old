@@ -1,10 +1,10 @@
 <?php
 
 /* Autoloader doesn't exist yet */
-include('/usr/local/reach_guard/mvc/app/library/reach_guard/Phalcon/Config/Config.php');
-include('/usr/local/reach_guard/mvc/app/library/reach_guard/Phalcon/Autoload/Loader.php');
+include('/usr/local/opnsense/mvc/app/library/OPNsense/Phalcon/Config/Config.php');
+include('/usr/local/opnsense/mvc/app/library/OPNsense/Phalcon/Autoload/Loader.php');
 
-return new reach_guard\Phalcon\Config\Config(array(
+return new OPNsense\Phalcon\Config\Config(array(
     'application' => array(
         'controllersDir' => __DIR__ . '/../../app/controllers/',
         'modelsDir'      => __DIR__ . '/../../app/models/',
@@ -12,7 +12,7 @@ return new reach_guard\Phalcon\Config\Config(array(
         'pluginsDir'     => __DIR__ . '/../../app/plugins/',
         'libraryDir'     => __DIR__ . '/../../app/library/',
         'cacheDir'       => __DIR__ . '/../../app/cache/',
-        'baseUri'        => '/reach_guard_gui/',
+        'baseUri'        => '/opnsense_gui/',
     ),
     'globals' => array(
         'config_path'    => '/conf/',

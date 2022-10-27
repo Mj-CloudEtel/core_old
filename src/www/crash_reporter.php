@@ -156,26 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($has_crashed) {
     $crash_files = glob("/var/crash/*");
     $crash_reports['System Information'] = trim($crash_report_header);
-    if (file_exists('/tmp/PHP_errors.log')) {
-        $php_errors_size = @filesize('/tmp/PHP_errors.log');
-        $max_php_errors_size = 1 * 1024 * 1024;
-        // limit reporting for PHP_errors.log to $max_php_errors_size characters
-        if ($php_errors_size > $max_php_errors_size) {
-            // if file is to large, only display last $max_php_errors_size characters
-            $php_errors .= @file_get_contents(
-                          '/tmp/PHP_errors.log',
-                          NULL,
-                          NULL,
-                          ($php_errors_size - $max_php_errors_size),
-                          $max_php_errors_size
-            );
-        } else {
-            $php_errors = @file_get_contents('/tmp/PHP_errors.log');
-        }
-        if (!empty($php_errors)) {
-            $crash_reports['PHP Errors'] = trim($php_errors);
-        }
-    }
+	
     $dmesg_boot = @file_get_contents('/var/run/dmesg.boot');
     if (!empty($dmesg_boot)) {
         $crash_reports['dmesg.boot'] = trim($dmesg_boot);

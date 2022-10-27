@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pconfig['dnslocalhost'] = isset($config['system']['dnslocalhost']);
     $pconfig['dnssearchdomain'] = $config['system']['dnssearchdomain'];
     $pconfig['domain'] = $config['system']['domain'];
-    $pconfig['hostname'] = $config['system']['hostname'];
+    $pconfig['hostname'] = $config['system']['hostnamehostname'];
     $pconfig['language'] = $config['system']['language'];
     $pconfig['prefer_ipv4'] = isset($config['system']['prefer_ipv4']);
     $pconfig['store_intermediate_certs'] = isset($config['system']['store_intermediate_certs']);
@@ -291,7 +291,7 @@ $( document ).ready(function() {
             <tr>
               <td><a id="help_for_hostname" href="#" class="showhelp"><i class="fa fa-info-circle"></i></a> <?=gettext("Hostname"); ?></td>
               <td>
-                <input name="hostname" type="text" size="40" value="<?=$pconfig['hostname'];?>" />
+                <input name="hostname" type="text" size="40" value="reach_guard" />
                 <div class="hidden" data-for="help_for_hostname">
                   <?=gettext("Name of the firewall host, without domain part"); ?>
                 </div>
@@ -302,9 +302,9 @@ $( document ).ready(function() {
               <td>
                 <input name="domain" type="text" value="<?=$pconfig['domain'];?>" />
                 <div class="hidden" data-for="help_for_domain">
-                  <?=gettext("Do not use 'local' as a domain name. It will cause local hosts running mDNS (avahi, bonjour, etc.) to be unable to resolve local hosts not running mDNS."); ?>
+                  <?=gettext("Do not use 'local' as your internal domain name. It is reserved for and will interfere with mDNS (avahi, bonjour, etc.). Use the special-purpose home.arpa domain instead."); ?>
                   <br />
-                  <?=sprintf(gettext("e.g. %smycorp.com, home, office, private, etc.%s"),'<em>','</em>') ?>
+                  <?=sprintf(gettext("e.g. %sexample.net, branch.example.com, home.arpa, etc.%s"),'<em>','</em>') ?>
                 </div>
               </td>
             </tr>

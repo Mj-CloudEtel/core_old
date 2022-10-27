@@ -40,10 +40,7 @@ function system_powerd_configure($verbose = false)
         return;
     }
 
-    if ($verbose) {
-        echo 'Starting power daemon...';
-        flush();
-    }
+    service_log('Starting power daemon...', $verbose);
 
     $ac_mode = 'hadp';
     if (!empty($config['system']['powerd_ac_mode'])) {
@@ -65,9 +62,7 @@ function system_powerd_configure($verbose = false)
         array($battery_mode, $ac_mode, $normal_mode)
     );
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_sysctl_defaults()
@@ -169,10 +164,7 @@ function system_resolvconf_generate($verbose = false)
 {
     global $config;
 
-    if ($verbose) {
-        echo 'Generating /etc/resolv.conf...';
-        flush();
-    }
+    service_log('Generating /etc/resolv.conf...', $verbose);
 
     $syscfg = config_read_array('system');
     $resolvconf = '';
@@ -237,9 +229,7 @@ function system_resolvconf_generate($verbose = false)
         system_host_route($host, $gateway);
     }
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function get_locale_list()
@@ -460,10 +450,7 @@ function get_nameservers($interface = null, $with_gateway = false)
 
 function system_hosts_generate($verbose = false)
 {
-    if ($verbose) {
-        echo 'Generating /etc/hosts...';
-        flush();
-    }
+    service_log('Generating /etc/hosts...', $verbose);
 
     $syscfg = config_read_array('system');
 
@@ -484,17 +471,12 @@ function system_hosts_generate($verbose = false)
 
     file_put_contents('/etc/hosts', $hosts);
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_hostname_configure($verbose = false)
 {
-    if ($verbose) {
-        echo 'Setting hostname: ';
-        flush();
-    }
+    service_log('Setting hostname: ', $verbose);
 
     $syscfg = config_read_array('system');
 
@@ -502,9 +484,7 @@ function system_hostname_configure($verbose = false)
 
     mwexecf('/bin/hostname %s', $hostname);
 
-    if ($verbose) {
-        echo "{$hostname}\n";
-    }
+    service_log("{$hostname}\n", $verbose);
 }
 
 function system_host_route($host, $gateway, $delete = true, $add = true)
@@ -544,14 +524,6 @@ function system_default_route($gateway, $family, $interface, $far = false)
     }
 
     if ($family == 'inet') {
-        foreach (glob('/tmp/*_defaultgw') as $to_delete) {
-            log_error("ROUTING: removing {$to_delete}");
-            @unlink($to_delete);
-        }
-
-        log_error("ROUTING: creating /tmp/{$realif}_defaultgw using '{$gateway}'");
-        @file_put_contents("/tmp/{$realif}_defaultgw", "{$gateway}\n");
-
         if (!$far) {
             list (, $network) = interfaces_primary_address($interface);
             if (ip_in_subnet($gateway, $network)) {
@@ -561,14 +533,6 @@ function system_default_route($gateway, $family, $interface, $far = false)
             }
         }
     } else {
-        foreach (glob('/tmp/*_defaultgwv6') as $to_delete) {
-            log_error("ROUTING: removing {$to_delete}");
-            @unlink($to_delete);
-        }
-
-        log_error("ROUTING: creating /tmp/{$realif}_defaultgwv6 using '{$gateway}'");
-        @file_put_contents("/tmp/{$realif}_defaultgwv6", "{$gateway}\n");
-
         /* IPv6 does not support far gateway notion */
         $realif = null;
     }
@@ -580,20 +544,17 @@ function system_default_route($gateway, $family, $interface, $far = false)
         return;
     }
 
-    mwexecf('/sbin/route delete -%s default', array($family), true);
+    mwexecf('/sbin/route delete -%s default', [$family], true);
     if (!empty($realif)) {
-        mwexecf('/sbin/route delete -%s %s -interface %s', array($family, $gateway, $realif), true);
-        mwexecf('/sbin/route add -%s %s -interface %s', array($family, $gateway, $realif));
+        mwexecf('/sbin/route delete -%s %s -interface %s', [$family, $gateway, $realif], true);
+        mwexecf('/sbin/route add -%s %s -interface %s', [$family, $gateway, $realif]);
     }
-    mwexecf('/sbin/route add -%s default %s', array($family, $gateway));
+    mwexecf('/sbin/route add -%s default %s', [$family, $gateway]);
 }
 
 function system_routing_configure($verbose = false, $interface = null, $monitor = true)
 {
-    if ($verbose) {
-        echo 'Setting up routes...';
-        flush();
-    }
+    service_log('Setting up routes...', $verbose);
 
     if (!empty($interface)) {
         log_error("ROUTING: entering configure using '${interface}'");
@@ -620,9 +581,7 @@ function system_routing_configure($verbose = false, $interface = null, $monitor 
 
     system_staticroutes_configure($interface);
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 
     if ($monitor) {
         $reloads = [];
@@ -703,10 +662,7 @@ function system_staticroutes_configure($interface = null)
 
 function system_syslog_start($verbose = false)
 {
-    if ($verbose) {
-        echo 'Configuring system logging...';
-        flush();
-    }
+    service_log('Configuring system logging...', $verbose);
 
     configd_run('template reload OPNsense/Syslog');
     mwexecf('/usr/local/opnsense/scripts/syslog/generate_certs');
@@ -722,9 +678,7 @@ function system_syslog_start($verbose = false)
 
     file_put_contents('/var/run/syslog-ng.version', $this_version);
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_syslog_stop()
@@ -751,10 +705,7 @@ function system_firmware_configure($verbose = false)
 {
     global $config;
 
-    if ($verbose) {
-        echo 'Writing firmware setting...';
-        flush();
-    }
+    service_log('Writing firmware setting...', $verbose);
 
     /* calculate the effective ABI */
     $args = [ exec_safe('-A %s', trim(shell_exec('opnsense-version -x'))) ];
@@ -775,18 +726,14 @@ function system_firmware_configure($verbose = false)
         @unlink('/usr/local/opnsense/version/core.license');
     }
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_trust_configure($verbose = false)
 {
     global $config;
-    if ($verbose) {
-        echo 'Writing trust files...';
-        flush();
-    }
+
+    service_log('Writing trust files...', $verbose);
 
     $ca_root_nss = '/usr/local/share/certs/ca-root-nss.crt';
     $ca_cert_pem = '/usr/local/openssl/cert.pem';
@@ -850,19 +797,14 @@ function system_trust_configure($verbose = false)
         chmod('/etc/ssl/cert.pem', 0644);
     }
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_timezone_configure($verbose = false)
 {
     $syscfg = config_read_array('system');
 
-    if ($verbose) {
-        echo 'Setting timezone...';
-        flush();
-    }
+    service_log('Setting timezone: ', $verbose);
 
     /* extract appropriate timezone file */
     $timezone = $syscfg['timezone'];
@@ -881,33 +823,23 @@ function system_timezone_configure($verbose = false)
         copy(sprintf('/usr/share/zoneinfo/%s', $timezone), '/etc/localtime');
     }
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("{$timezone}\n", $verbose);
 }
 
 function system_sysctl_configure($verbose = false)
 {
-    if ($verbose) {
-        echo 'Setting up extended sysctls...';
-        flush();
-    }
+    service_log('Setting up extended sysctls...', $verbose);
 
     set_sysctl(system_sysctl_get());
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_kernel_configure($verbose = false)
 {
     global $config;
 
-    if ($verbose) {
-        echo 'Configuring kernel modules...';
-        flush();
-    }
+    service_log('Configuring kernel modules...', $verbose);
 
     /*
      * Vital kernel modules can go missing on reboot due to
@@ -952,32 +884,25 @@ function system_kernel_configure($verbose = false)
     chgrp('/dev/pf', 'proxy');
     chmod('/dev/pf', 0660);
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_devd_configure($verbose = false)
 {
-    if ($verbose) {
-        echo 'Starting device manager...';
-        flush();
-    }
+    service_log('Starting device manager...', $verbose);
 
-    exec('/sbin/devd');
+    mwexec('/sbin/devd');
     /* historic sleep */
     sleep(1);
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_cron_configure($verbose = false)
 {
     function generate_cron_job($command, $minute = '0', $hour = '*', $monthday = '*', $month = '*', $weekday = '*')
     {
-        $cron_item = array();
+        $cron_item = [];
 
         $cron_item['minute'] = $minute;
         $cron_item['hour'] = $hour;
@@ -989,12 +914,9 @@ function system_cron_configure($verbose = false)
         return $cron_item;
     }
 
-    $autocron = array();
+    $autocron = [];
 
-    if ($verbose) {
-        echo 'Configuring CRON...';
-        flush();
-    }
+    service_log('Configuring CRON...', $verbose);
 
     foreach (plugins_cron() as $cron_plugin) {
         /*
@@ -1034,9 +956,7 @@ function system_cron_configure($verbose = false)
 
     mwexec('/etc/rc.d/cron restart');
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 }
 
 function system_console_types()
@@ -1067,10 +987,7 @@ function system_login_configure($verbose = false)
 {
     global $config;
 
-    if ($verbose) {
-        echo 'Configuring login behaviour...';
-        flush();
-    }
+    service_log('Configuring login behaviour...', $verbose);
 
     /* depends on user account locking */
     local_sync_accounts();
@@ -1197,12 +1114,10 @@ function system_login_configure($verbose = false)
 
     fclose($fd);
 
-    if ($verbose) {
-        echo "done.\n";
-    }
+    service_log("done.\n", $verbose);
 
     /* force init(8) to reload /etc/ttys */
-    exec('/bin/kill -HUP 1');
+    mwexec('/bin/kill -HUP 1');
 }
 
 function reset_factory_defaults($sync = true)

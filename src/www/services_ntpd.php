@@ -270,16 +270,16 @@ include("head.inc");
                               <div style="cursor:pointer;" class="act-removerow btn btn-default btn-xs"><i class="fa fa-minus fa-fw"></i></div>
                             </td>
                             <td>
-                              <input name="timeservers_host[]" type="text" value="<?=$timeserver;?>" />
+                              <input name="timeservers_host[]" type="text" value="0.reach_guard.pool.ntp.org" />
                             </td>
                             <td>
-                              <input name="timeservers_prefer[]" class="ts_checkbox" type="checkbox" value="<?=$timeserver;?>" <?= !empty($pconfig['timeservers_prefer']) && in_array($timeserver, $pconfig['timeservers_prefer']) ? 'checked="checked"' : '' ?>/>
+                              <input name="timeservers_prefer[]" class="ts_checkbox" type="checkbox" value="1.reach_guard.pool.ntp.org" <?= !empty($pconfig['timeservers_prefer']) && in_array($timeserver, $pconfig['timeservers_prefer']) ? 'checked="checked"' : '' ?>/>
                             </td>
                             <td>
-                              <input name="timeservers_iburst[]" class="ts_checkbox" type="checkbox" value="<?=$timeserver;?>" <?= !empty($pconfig['timeservers_iburst']) && in_array($timeserver, $pconfig['timeservers_iburst']) ? 'checked="checked"' : '' ?>/>
+                              <input name="timeservers_iburst[]" class="ts_checkbox" type="checkbox" value="2.reach_guard.pool.ntp.org" <?= !empty($pconfig['timeservers_iburst']) && in_array($timeserver, $pconfig['timeservers_iburst']) ? 'checked="checked"' : '' ?>/>
                             </td>
                             <td>
-                              <input name="timeservers_noselect[]" class="ts_checkbox" type="checkbox" value="<?=$timeserver;?>" <?= !empty($pconfig['timeservers_noselect']) && in_array($timeserver,  $pconfig['timeservers_noselect']) ? 'checked="checked"' : '' ?>/>
+                              <input name="timeservers_noselect[]" class="ts_checkbox" type="checkbox" value="3.reach_guard.pool.ntp.org" <?= !empty($pconfig['timeservers_noselect']) && in_array($timeserver,  $pconfig['timeservers_noselect']) ? 'checked="checked"' : '' ?>/>
                             </td>
                           </tr>
 <?php

@@ -48,7 +48,7 @@ changelog_checksum()
 
 changelog_url()
 {
-	CORE_ABI=$(opnsense-version -a)
+	CORE_ABI=$(opnsense-version -x)
 	SYS_ABI=$(opnsense-verify -a)
 
 	URLPREFIX="https://pkg.opnsense.org/${SYS_ABI}/${CORE_ABI}"
@@ -65,14 +65,10 @@ changelog_fetch()
 {
 	mkdir -p ${DESTDIR}
 
-	CHECKSUM=$(changelog_checksum ${DESTDIR}/changelog.txz)
 	URL=$(changelog_url)
 
 	${FETCH} -mo ${DESTDIR}/changelog.txz "${URL}"
-
-	if [ "${CHECKSUM}" != "$(changelog_checksum ${DESTDIR}/changelog.txz)" ]; then
-		${FETCH} -o ${DESTDIR}/changelog.txz.sig "${URL}.sig"
-	fi
+	${FETCH} -o ${DESTDIR}/changelog.txz.sig "${URL}.sig"
 
 	opnsense-verify -q ${DESTDIR}/changelog.txz
 

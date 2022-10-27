@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2020-2021 Deciso B.V.
+# Copyright (c) 2020-2022 Deciso B.V.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -26,11 +26,13 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 
-set -e
-
 # prepare and startup unbound, so we can easily background it
 
 DOMAIN=${1}
+
+for FILE in $(find /var/unbound/etc -depth 1); do
+	rm -rf ${FILE}
+done
 
 # if the root.key file is missing or damaged, run unbound-anchor
 if ! /usr/local/sbin/unbound-checkconf /var/unbound/unbound.conf 2> /dev/null; then
@@ -44,20 +46,19 @@ if ! /usr/local/sbin/unbound-checkconf /var/unbound/unbound.conf 2> /dev/null; t
 
 	# unbound-anchor exits with 1 on failover, since we would still like to start unbound,
 	# always let this succeed
-	chroot -u unbound -g unbound / /usr/local/sbin/unbound-anchor -a /var/unbound/root.key ${OPT_RESOLVE} || true
+	chroot -u unbound -g unbound / /usr/local/sbin/unbound-anchor -a /var/unbound/root.key ${OPT_RESOLVE}
 fi
 
 if [ ! -f /var/unbound/unbound_control.key ]; then
 	chroot -u unbound -g unbound / /usr/local/sbin/unbound-control-setup -d /var/unbound
 fi
 
-for FILE in $(find /var/unbound/etc -depth 1); do
-	rm -rf ${FILE}
-done
-
 for FILE in $(find /usr/local/etc/unbound.opnsense.d -depth 1 -name '*.conf'); do
 	cp ${FILE} /var/unbound/etc/
 done
+
+# XXX remove obsolete file, last used in 22.7
+rm -f /usr/local/etc/unbound.opnsense.d/dnsbl.conf
 
 chown -R unbound:unbound /var/unbound
 
